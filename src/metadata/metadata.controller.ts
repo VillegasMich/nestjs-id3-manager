@@ -51,6 +51,7 @@ export class MetadataController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log('File uploaded: ' + file.originalname);
     return {
       message: 'File received',
       filename: file.originalname,
