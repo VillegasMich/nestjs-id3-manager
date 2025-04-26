@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
@@ -19,9 +20,12 @@ export class AuthService {
   async register(registerDto: RegisterDto): Promise<{
     access_token: string;
   }> {
-    const existing = await this.usersService.findByEmail(registerDto.email);
-    if (existing) {
-      throw new ConflictException('Email is already in use');
+    try {
+      await this.usersService.findByEmail(registerDto.email);
+    } catch (err) {
+      if (!(err instanceof NotFoundException)) {
+        throw new ConflictException('Email is already in use');
+      }
     }
     const user = await this.usersService.create(registerDto as CreateUserDto);
     const payload = { sub: user.id, username: user.name };
@@ -32,12 +36,12 @@ export class AuthService {
   }
 
   async signIn(
-    username: string,
+    email: string,
     pass: string,
   ): Promise<{
     access_token: string;
   }> {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne(email);
     if (!user) {
       throw new UnauthorizedException();
     }
