@@ -41,12 +41,12 @@ export class AuthService {
   ): Promise<{
     access_token: string;
   }> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
     }
     const isMatch = await bcrypt.compare(pass, user.password);
-    if (isMatch) {
+    if (!isMatch) {
       throw new UnauthorizedException();
     }
     const payload = { sub: user.id, username: user.name };
