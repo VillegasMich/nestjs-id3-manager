@@ -1,12 +1,20 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
 export class SongMetadata {
+  @ManyToOne(() => User, (user) => user.songs, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  user: User;
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
